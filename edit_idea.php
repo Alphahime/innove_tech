@@ -1,4 +1,6 @@
+
 <?php
+session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -17,7 +19,8 @@ if(isset($_GET['id']) && !empty($_GET['id'])) {
         $idea = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if(!$idea) {
-            echo "L'idée avec cet ID n'existe pas.";
+            echo "L'idée avec l'ID n'existe pas.";
+            echo '<script>window.location.replace("ideas.php");</script>';
             exit();
         }
     } catch(PDOException $e) {
@@ -28,6 +31,33 @@ if(isset($_GET['id']) && !empty($_GET['id'])) {
 } else {
     echo "ID d'idée non spécifié.";
 }
+
+// Si le formulaire est soumis
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Récupérer les données du formulaire
+        $title = $_POST['title'];
+        $description = $_POST['description'];
+
+        // Préparer et exécuter la requête de mise à jour
+        $stmt = $conn->prepare("UPDATE Idée SET Titre = :title, Description = :description WHERE ID_idée = :id");
+        $stmt->bindParam(':title', $title);
+        $stmt->bindParam(':description', $description);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        // Rediriger vers la page d'idées après l'enregistrement
+        header("Location: ideas.php");
+        exit();
+    } catch(PDOException $e) {
+        echo "Erreur : " . $e->getMessage();
+    }
+
+    $conn = null;
+}
 ?>
 
 <!DOCTYPE html>
@@ -36,7 +66,7 @@ if(isset($_GET['id']) && !empty($_GET['id'])) {
     <meta charset="UTF-8">
     <title>Modifier une idée</title>
     <style>
-        body {
+     body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
             margin: 0;

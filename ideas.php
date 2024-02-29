@@ -1,3 +1,4 @@
+
 <?php
 $servername = "localhost";
 $username = "root";
@@ -8,12 +9,13 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupérer toutes les catégories de la base de données
     $stmt_categories = $conn->query("SELECT * FROM Catégorie");
     $categories = $stmt_categories->fetchAll(PDO::FETCH_ASSOC);
 
-    // Récupérer les idées avec leurs catégories
-    $stmt_ideas = $conn->query("SELECT Idée.*, Catégorie.Nom_catégorie FROM Idée LEFT JOIN Catégorie ON Idée.ID_catégorie = Catégorie.ID_catégorie");
+    $stmt_ideas = $conn->query("SELECT Idée.*, Utilisateur.Nom AS Nom_utilisateur, Catégorie.Nom_catégorie 
+    FROM Idée 
+    LEFT JOIN Utilisateur ON Idée.ID_utilisateur = Utilisateur.ID_utilisateur 
+    LEFT JOIN Catégorie ON Idée.ID_catégorie = Catégorie.ID_catégorie");
     $ideas = $stmt_ideas->fetchAll(PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
     echo "Erreur : " . $e->getMessage();
@@ -28,7 +30,7 @@ $conn = null;
     <meta charset="UTF-8">
     <title>Liste des idées</title>
     <style>
-        body {
+       body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
             margin: 0;
@@ -96,7 +98,7 @@ $conn = null;
         }
 
         .action-buttons input[type="submit"]:hover, .action-buttons a:hover {
-            background-color: #0056b3; 
+            background-color: #007bff; 
         }
 
         .category-dropdown {
@@ -138,6 +140,7 @@ $conn = null;
                     <th>Titre</th>
                     <th>Description</th>
                     <th>Catégorie</th>
+                    <th>Utilisateur</th>
                     <th>Action</th> 
                 </tr>
             </thead>
@@ -149,11 +152,17 @@ $conn = null;
                         <td>
                             <?php 
                             // Vérifie si la catégorie est définie pour l'idée
-                            if (!empty($idea['ID_catégorie'])) {
-                                echo $idea['ID_catégorie'];
+                            if (!empty($idea['Nom_catégorie'])) {
+                                echo $idea['Nom_catégorie'];
                             } else {
                                 echo "Aucune catégorie définie";
                             }
+                            ?>
+                        </td>
+                        <td>
+                            <?php 
+                           
+                            echo isset($idea['Nom_utilisateur']) ? $idea['Nom_utilisateur'] : "Utilisateur inconnu";
                             ?>
                         </td>
                         <td>

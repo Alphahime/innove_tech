@@ -8,34 +8,34 @@ $password = '';
 try {
     
     $pdo = new PDO($dsn, $username, $password);
-    // Configureration du PDO pour qu'il génère des exceptions en cas d'erreur
+   
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Récupéreration des utilisateurs
+   
     $utilisateurs = array();
     $stmt_utilisateurs = $pdo->query("SELECT * FROM Utilisateur");
     while ($row = $stmt_utilisateurs->fetch(PDO::FETCH_ASSOC)) {
         $utilisateurs[] = $row;
     }
 
-    // Récupéreration des catégories
+   
     $categories = array();
     $stmt_categories = $pdo->query("SELECT * FROM Catégorie");
     while ($row = $stmt_categories->fetch(PDO::FETCH_ASSOC)) {
         $categories[] = $row;
     }
 
-    // Récupéreration des idées
+    
     $idées = array();
     $stmt_idées = $pdo->query("SELECT * FROM Idée");
     while ($row = $stmt_idées->fetch(PDO::FETCH_ASSOC)) {
         $idées[] = $row;
     }
 
-    // Fermeture de la connexion PDO
+    
     $pdo = null;
 } catch (PDOException $e) {
-    // Les erreurs de connexion PDO
+   
     echo "Erreur de connexion : " . $e->getMessage();
 }
 
@@ -63,13 +63,13 @@ try {
             background-color: #f2f2f2;
         }
         .category-design {
-            background-color: #ffe6e6; /* Rouge clair */
+            background-color: #ffe6e6; 
         }
         .category-development {
-            background-color: #e6ffe6; /* Vert clair */
+            background-color: #e6ffe6; 
         }
         .category-marketing {
-            background-color: #e6e6ff; /* Bleu clair */
+            background-color: #e6e6ff;
         }
 
     </style>
@@ -84,14 +84,18 @@ try {
                 <li><a href="idea.php">Details de l'idée</a></li>
                 <li><a href="ideas.php">Liste des idées non terminées</a></li>
                 <li><a href="category.php">Details de la catégorie</a></li>
+                <li><a href="logout.php">Deconnexion</a></li>
             </ul>
+            
         </nav>
-
-        
+               <div class="profil_user">
+                   <li><a href="profile.php">Profile</a></li>
+                   </div>  
+        </header>    
         <style>
 
             
-            header {
+header {
     background-color: #007bff;
     color: #fff;
     padding: 20px; 
@@ -99,22 +103,35 @@ try {
 }
 
 h1 {
-    margin: 0; /
+    margin: 0; 
 }
 
 nav ul {
     list-style-type: none; 
     padding: 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 nav ul li {
     display: inline;
     margin-right: 20px; 
+    background-color: white;
+    border-radius: 1rem;
+    width: 200px;
+    height: 40px;
 }
-
+nav ul li:hover{
+    background-color: blue;
+    color: white;
+}
 nav ul li a {
-    color: #fff; 
+    color: black; 
     text-decoration: none; 
+    font-weight: 6OO;
+
+
 }
 
 nav ul li a:hover {
@@ -122,6 +139,22 @@ nav ul li a:hover {
     
 }
 
+.profil_user{
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border-radius: 100%;
+    margin-left: 100rem;
+    margin-top: -5.5rem;
+}
+.profil_user li{
+    padding-left: 7rem;
+    color: white;
+    font-weight: 600;
+    padding-top: 2rem;
+    text-decoration: none;
+    list-style-type: none;
+}
 
         </style>
     </header>

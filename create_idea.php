@@ -1,59 +1,63 @@
 <?php
+session_start();
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    
+    header("location: login.php");
+    exit;
+}
+
 
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "innove_solution";
 
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    try {
+       
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    if(isset($_POST['Titre']) && isset($_POST['Description']) && isset($_POST['category_id'])) {
-        $title = $_POST['Titre'];
-        $description = $_POST['Description'];
-        $category_id = $_POST['category_id'];
-        
-        $user_id = 1; 
+       
+        if(isset($_POST['Titre']) && isset($_POST['Description']) && isset($_POST['category_id'])) {
+           
+            $title = $_POST['Titre'];
+            $description = $_POST['Description'];
+            $category_id = $_POST['category_id'];
 
-        $sql = "SELECT ID_catégorie FROM Catégorie WHERE Nom_catégorie = :category_id";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':category_id', $category_id);
-        $stmt->execute();
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $category_id = $result['ID_catégorie'];
+            $user_id = $_SESSION['ID_utilisateur'];
+            $user_id = 1;
 
-        $stmt = $conn->prepare("INSERT INTO Idée (Titre, Description, Date_de_création, ID_catégorie, ID_utilisateur) VALUES (:title, :description, NOW(), :category_id, :user_id)");
-        $stmt->bindParam(':title', $title);
-        $stmt->bindParam(':description', $description);
-        $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-        $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmt = $conn->prepare("INSERT INTO Idée (Titre, Description, Date_de_création, ID_catégorie, ID_utilisateur) VALUES (:title, :description, NOW(), :category_id, :user_id)");
+            $stmt->bindParam(':title', $title);
+            $stmt->bindParam(':description', $description);
+            $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
 
-        if($stmt->execute()) {
-            
-            header("Location: ideas.php");
-            exit(); 
+            if($stmt->execute()) {
+                header("Location: ideas.php");
+                exit(); 
+            } else {
+                echo "Erreur lors de l'insertion de l'idée.";
+            }
         }
+    } catch(PDOException $e) {
+        echo "Erreur : " . $e->getMessage();
+    } finally {
+        $conn = null;
     }
-} catch(PDOException $e) {
-    echo "Erreur : " . $e->getMessage();
 }
-
-$conn = null;
-
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Créer une nouvelle idée</title>
-   
 </head>
 <body>
+
     <h1>Créer une nouvelle idée</h1>
     <form method="post">
         <div>
@@ -69,14 +73,17 @@ $conn = null;
             <select id="category" name="category_id" required>
                 <option value="1">Design</option>
                 <option value="2">Development</option>
-                <option value="3">Marketing</option>
-                <!-- Ajoutez d'autres options selon vos catégories existantes -->
+                <option value="3">Marketing Digital</option>
             </select>
         </div>
         <div>
             <button type="submit">Créer</button>
         </div>
     </form>
+</body>
+</html>
+
+
     <style>
         body {
     font-family: Arial, sans-serif;
